@@ -227,6 +227,18 @@ if(ZLIB_BUILD_STATIC)
     set_target_properties(
         zlibstatic PROPERTIES EXPORT_NAME ZLIBSTATIC OUTPUT_NAME
                                                      z${zlib_static_suffix})
+if(MSVC)
+    if(NOT BUILD_SHARED_LIBS)
+        set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY_DEFAULT "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        set(CMAKE_EXE_LINKER_FLAGS "-static")
+    endif()
+
+    target_link_options(zlibstatic PUBLIC /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)
+    target_link_options(zlibstatic PRIVATE /INCREMENTAL:NO /NODEFAULTLIB:MSVCRT)
+    set_target_properties(${ALL_BUILD_TARGETS} PROPERTIES SOVERSION 1)
+endif(MSVC)
 endif(ZLIB_BUILD_STATIC)
 
 if(ZLIB_INSTALL)
